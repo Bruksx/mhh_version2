@@ -1,0 +1,21 @@
+1. Bot posts Wednesday 5PM EST a signup thread
+2. After 23 hours the bot collects all of the "PRODUCER" and "EMCEE" reddit usernames
+3. After 24 hours Thursday 5PM EST bot posts submission thread (SET TO CONTEST MODE, STICKIED, APPROVED) randomly generating teams by commenting each team into the submission thread. First come first serve and odd numbers of "producers" or "EMCEES" will be held as backup substitutions in case other team members drop out from either team. (we need a rule.. if you drop out of the competition and leave your teammade abandoned you can't join for X amount of competitions. Can't have people joining and quitting on their teammates with no reprecussions imo. We need to prevent it as much as we can before people even sign up they have to be sure they can complete a track.
+
+{{{Comment layout}}}
+
+MHH-OFFICIALBOT
+
+TEAM - 01
+PRODUCER: u/BRUKS
+EMCEE: u/CATZ
+
+Reply to this comment with your completed track and DAW playlist image before the deadline
+
+
+
+4. Rule. if your team member drops out and if there are no substitutes at the ready you will have to join the following week.
+
+5. Bot stays idle for 12 days when a task posts Monday 3PM EST all of the soundcloud link submissions into a voting thread for the r/makinghiphop subreddit to vote on. including which team TEAM - 01 and the members in that team which your bot already inputed into the original comment for submissions.
+6. 1 day later Tuesday 3PM EST Bot declares winner and DM's them asking for the next challenges theme (not beat) just theme
+7. Bot collects the theme within 24 hours and posts the next challenge at 3PM EST 2 weeks after the competitions started, completing the cycle.
