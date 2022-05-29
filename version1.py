@@ -9,7 +9,7 @@ import random
 warnings.filterwarnings("ignore")
 print("started", flush = True)
 
-root = "C:/Users/Owner/Documents/projects/python/bot2/"
+root = "/home/MHHOfficialBot/mhh_version2/"
 
 with open(root + "json/var.json") as f:
     var = f.read()

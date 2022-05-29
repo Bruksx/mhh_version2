@@ -1,4 +1,4 @@
-from version1 import Bot, root
+from version1 import Bot
 import random
 import time
 import json
@@ -10,7 +10,7 @@ class TeamBot(Bot):
         with open(root + file, "r") as f:
             id = json.loads(f.read())
         return id.get("id")
-    
+
     def get_value(self, key, file):
         with open(root + file, "r") as f:
             data = json.loads(f.read())
@@ -51,7 +51,7 @@ class TeamBot(Bot):
             f.write(json.dumps(teams))
         return teams
 
-    
+
     def post_collection_thread(self):
         with open(root+ "text/sign_up_title.txt") as f:
             title = f.read().format(self.nonce)
@@ -73,7 +73,7 @@ class TeamBot(Bot):
         thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="team")
         print(self.save_id(thrd, "json/sub.json"))
         return thrd
-        
+
     def save_id(self, id, file):
         data = {
             "id": str(id)
@@ -81,7 +81,7 @@ class TeamBot(Bot):
         with open(root + file, "w") as f:
             f.write(json.dumps(data))
         return f"saved id to {file}"
-    
+
     def save_key(self, key, file, new_value):
         with open(root + file, "r") as f:
             data = json.loads(f.read())
@@ -115,7 +115,7 @@ class TeamBot(Bot):
         thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="team")
         print(self.save_id(thrd, "json/vot.json"))
         return thrd
-    
+
     def comment_in_vot_thread(self):
         id = self.get_id("json/vot.json")
         thrd = self.reddit.submission(id=id)
@@ -133,7 +133,7 @@ class TeamBot(Bot):
             print("commented on voting thread")
             number += 1
         self.save_id(id, "json/vot.json")
-    
+
     def get_beats(self):
         id = self.get_id("json/sub.json")
         all_comments = self.reddit.submission(id=id).comments
@@ -159,7 +159,7 @@ class TeamBot(Bot):
                             for key in teams:
                                 if str(reply.author) in teams[key]:
                                     teams[key].append(new)
-                                    teams[key].append(reply.created_utc)                          
+                                    teams[key].append(reply.created_utc)
         return teams
 
     def count_winner(self):
@@ -203,12 +203,12 @@ class TeamBot(Bot):
             for key in data:
                 if data[key] == winner:
                     winning_team = key
-            self.save_key("winner", "json/arg.json", result[0])
+            self.save_key("winner", "json/arg.json", key)
             return [[winning_team],num_of_votes]
         else:
-            self.save_key("winner", "json/arg.json", key)
+            self.save_key("winner", "json/arg.json", result[0])
             return [result, num_of_votes]
-    
+
     def declare_winner(self):
         winners = self.get_value("winner", "json/arg.json")
         print(winners)
@@ -235,7 +235,7 @@ class TeamBot(Bot):
                 print(producer)
                 self.reddit.redditor(producer).message("Request for next week's theme", text)
                 print("dm sent to winner")
-    
+
     def check_on_winner(self):
         winners = self.get_value("winner", "json/arg.json")
         producer = winners.split()[0]
@@ -254,17 +254,20 @@ class TeamBot(Bot):
                 print("saving new beat from list", self.beat)
 
     def run(self):
-        """self.post_collection_thread()
-        time.sleep(120)
+        self.post_collection_thread()
+        time.sleep(150)
         self.create_submission_thread()
         self.comment_on_sub_thread()
-        time.sleep(120)
+        time.sleep(150)
         self.create_voting_thread()
         self.comment_in_vot_thread()
-        time.sleep(120)"""
-        #self.count_winner()
-        #self.declare_winner()
+        time.sleep(150)
+        self.count_winner()
+        self.declare_winner()
+        time.sleep(150)
+        self.check_on_winner()
 
+root = "/home/MHHOfficialBot/mhh_version2/"
 
 with open(root + "json/arg.json") as f:
     arg = f.read()
