@@ -4,6 +4,8 @@ import time
 import json
 import praw
 import re
+import schedule
+from datetime import datetime, timedelta
 
 class TeamBot(Bot):
     def get_id(self, file):
@@ -58,8 +60,7 @@ class TeamBot(Bot):
         with open(root+ "text/sign_up_thread.txt") as f:
             text = f.read()
         sub = self.reddit.subreddit(self.subreddit)
-        thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="team")
-        print(f"id of collection thread is {thrd}")
+        thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="MHH TEAMS")
         print(self.save_id(thrd, "json/col.json"))
         return thrd
 
@@ -68,9 +69,9 @@ class TeamBot(Bot):
         with open(root+ "text/sub_thrd_title.txt") as f:
             title = f.read().format(self.nonce)
         with open(root+ "text/sub_thrd_body.txt") as f:
-            text = f.read()
+            text = f.read().format(self.theme)
         sub = self.reddit.subreddit(self.subreddit)
-        thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="team")
+        thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="MHH TEAMS")
         print(self.save_id(thrd, "json/sub.json"))
         return thrd
 
@@ -112,7 +113,7 @@ class TeamBot(Bot):
         with open(root+ "text/voting.txt") as f:
             text = f.read()
         sub = self.reddit.subreddit(self.subreddit)
-        thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="team")
+        thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="MHH TEAMS")
         print(self.save_id(thrd, "json/vot.json"))
         return thrd
 
@@ -163,7 +164,6 @@ class TeamBot(Bot):
         return teams
 
     def count_winner(self):
-        vote = 0
         id = self.get_id("json/vot.json")
         thrd = self.reddit.submission(id=id)
         data = {}
@@ -211,7 +211,6 @@ class TeamBot(Bot):
 
     def declare_winner(self):
         winners = self.get_value("winner", "json/arg.json")
-        print(winners)
         vote_count = self.vote_count
         id = self.get_id("json/vot.json")
         thrd = self.reddit.submission(id=id)
@@ -227,7 +226,7 @@ class TeamBot(Bot):
                 print("winner found")
                 with open(root + "text/declare_winner.txt", "r") as f:
                     text = f.read()
-                    comment.reply(text.format(vote_count))
+                    comment.reply(text.format(vote_count, producer))
                     print("winner decleared")
                 with open(root + "text/dm_winner.txt", "rb") as f:
                     text = f.read().decode('utf-8')
@@ -239,32 +238,46 @@ class TeamBot(Bot):
     def check_on_winner(self):
         winners = self.get_value("winner", "json/arg.json")
         producer = winners.split()[0]
-        mes = self.reddit.inbox.all()
+        mes = self.reddit.inbox.all(limit = 5)
+        theme_c = None
         for dm in mes:
+            print(dm.author)
             if str(dm.author) == producer and "#" in dm.body:
                 new_theme = dm.body[1:]
                 theme_c = True
                 print("new theme found", new_theme)
                 self.save_key("theme", "json/arg.json", new_theme)
+                break
         if not theme_c:
-            with open(root + "text/beats.txt", "r") as f:
+            with open(root + "text/themes.txt", "r") as f:
                 beat_list = f.readlines()
                 new_beat = random.choice(beat_list)
                 self.beat = new_beat
-                print("saving new beat from list", self.beat)
+                print(f"saving new theme from list '{self.beat}'")
+        self.save_key("nonce", "json/arg.json", self.nonce + 1)
+
+    def get_today(self):
+        d = datetime.today()
+        return d.day
+
+    def get_future(self):
+        d = datetime.today()
+        span = timedelta(days = +4)
+        new = d + span
+        return new.day
 
     def run(self):
-        self.post_collection_thread()
-        time.sleep(150)
-        self.create_submission_thread()
-        self.comment_on_sub_thread()
-        time.sleep(150)
-        self.create_voting_thread()
-        self.comment_in_vot_thread()
-        time.sleep(150)
-        self.count_winner()
-        self.declare_winner()
-        time.sleep(150)
+        #self.post_collection_thread()
+        #time.sleep(180)
+        #self.create_submission_thread()
+        #self.comment_on_sub_thread()
+        #time.sleep(150)
+        #self.create_voting_thread()
+        #self.comment_in_vot_thread()
+        #time.sleep(180)
+        #self.count_winner()
+        #self.declare_winner()
+        #time.sleep(150)
         self.check_on_winner()
 
 root = "/home/MHHOfficialBot/mhh_version2/"
@@ -297,4 +310,62 @@ reddit = praw.Reddit(
 
 "makinghiphop"
 test_bot = TeamBot(reddit, beat, "test_bruks_bot", nonce, theme , winner, votes,sub.get("id"), vot.get("id"))
-print(test_bot.run())
+#print(test_bot.get_future())
+
+def job():
+    if test_bot.get_today() == test_bot.get_value("signup", "json/schedule.json"):
+        test_bot.post_collection_thread()
+        new = test_bot.get_future()
+        test_bot.save_key("signup", "json/schedule.json", new)
+    else:
+        print("not today")
+        exit()
+
+def job2():
+    if test_bot.get_today() == test_bot.get_value("submission", "json/schedule.json"):
+        test_bot.create_submission_thread()
+        test_bot.comment_on_sub_thread()
+        new = test_bot.get_future()
+        test_bot.save_key("submission", "json/schedule.json", new)
+    else:
+        print("not today")
+        exit()
+
+def job3():
+    if test_bot.get_today() == test_bot.get_value("voting", "json/schedule.json"):
+        test_bot.create_voting_thread()
+        test_bot.comment_in_vot_thread()
+        new = test_bot.get_future()
+        test_bot.save_key("voting", "json/schedule.json", new)
+    else:
+        print("not today")
+        exit()
+
+def job4():
+    if test_bot.get_today() == test_bot.get_value("declare", "json/schedule.json"):
+        test_bot.count_winner()
+        test_bot.declare_winner()
+        new = test_bot.get_future()
+        test_bot.save_key("declare", "json/schedule.json", new)
+    else:
+        print("not today")
+        exit()
+
+def job5():
+    if test_bot.get_today() == test_bot.get_value("checkon", "json/schedule.json"):
+        test_bot.check_on_winner()
+        new = test_bot.get_future()
+        test_bot.save_key("checkon", "json/schedule.json", new)
+    else:
+        print("not today")
+        exit()
+
+#job()
+
+schedule.every().day.at("17:25").do(job)
+schedule.every().day.at("17:26").do(job2)
+schedule.every().day.at("17:27").do(job3)
+schedule.every().day.at("17:28").do(job4)
+schedule.every().day.at("15:30").do(job5)
+while True:
+    schedule.run_pending()

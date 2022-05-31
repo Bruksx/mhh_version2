@@ -1,0 +1,1 @@
+source /home/MHHOfficialBot/bot/reddit/my-env/bin/activate && python  /home/MHHOfficialBot/mhh_version2/bot.py
