@@ -115,6 +115,7 @@ class TeamBot(Bot):
         sub = self.reddit.subreddit(self.subreddit)
         thrd = sub.submit(title=title, selftext=text, flair_id="696563b6-b1bd-11ec-a33b-e6cb802295fa", flair_text="MHH TEAMS")
         print(self.save_id(thrd, "json/vot.json"))
+        self.save_key("nonce", "json/arg.json", self.nonce + 1)
         return thrd
 
     def comment_in_vot_thread(self):
@@ -254,7 +255,8 @@ class TeamBot(Bot):
                 new_beat = random.choice(beat_list)
                 self.beat = new_beat
                 print(f"saving new theme from list '{self.beat}'")
-        self.save_key("nonce", "json/arg.json", self.nonce + 1)
+                self.save_key("theme", "json/arg.json", new_theme)
+
 
     def get_today(self):
         d = datetime.today()
@@ -317,6 +319,7 @@ def job():
         test_bot.post_collection_thread()
         new = test_bot.get_future()
         test_bot.save_key("signup", "json/schedule.json", new)
+        exit()
     else:
         print("not today")
         exit()
@@ -327,6 +330,7 @@ def job2():
         test_bot.comment_on_sub_thread()
         new = test_bot.get_future()
         test_bot.save_key("submission", "json/schedule.json", new)
+        exit()
     else:
         print("not today")
         exit()
@@ -337,6 +341,7 @@ def job3():
         test_bot.comment_in_vot_thread()
         new = test_bot.get_future()
         test_bot.save_key("voting", "json/schedule.json", new)
+        exit()
     else:
         print("not today")
         exit()
@@ -347,6 +352,7 @@ def job4():
         test_bot.declare_winner()
         new = test_bot.get_future()
         test_bot.save_key("declare", "json/schedule.json", new)
+        exit()
     else:
         print("not today")
         exit()
@@ -356,6 +362,7 @@ def job5():
         test_bot.check_on_winner()
         new = test_bot.get_future()
         test_bot.save_key("checkon", "json/schedule.json", new)
+        exit()
     else:
         print("not today")
         exit()
@@ -366,6 +373,6 @@ schedule.every().day.at("17:25").do(job)
 schedule.every().day.at("17:26").do(job2)
 schedule.every().day.at("17:27").do(job3)
 schedule.every().day.at("17:28").do(job4)
-schedule.every().day.at("15:30").do(job5)
+schedule.every().day.at("15:40").do(job5)
 while True:
     schedule.run_pending()
